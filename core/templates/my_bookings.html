@@ -19,22 +19,31 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand logo" href="{% url 'home' %}">Royal Crown</a>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: #0F4C5C;">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">Royal Crown</a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{% url 'services' %}">Services</a>
+                <a class="nav-link" href="{% url 'gallery' %}">Gallery</a>
                 <a class="nav-link" href="{% url 'my_bookings' %}">My Bookings</a>
+                
                 {% if user.is_authenticated %}
                     <span class="nav-link">Hi, {{ user.username }}</span>
                     <a class="btn btn-outline-light ms-3" href="{% url 'logout' %}">Logout</a>
                 {% else %}
                     <a class="btn btn-outline-light ms-3" href="{% url 'login' %}">Login</a>
-                    <a class="btn btn-gold ms-2" href="{% url 'register' %}">Register</a>
+                    <a class="btn btn-light ms-2" href="{% url 'register' %}">Register</a>
                 {% endif %}
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <div class="container mt-5 pt-5">
         <h1 class="display-5 fw-bold text-center mb-5" style="color: #0F4C5C;">My Appointments</h1>
