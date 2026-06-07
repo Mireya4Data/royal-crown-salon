@@ -1,21 +1,22 @@
 {
-  "name": "Royal Crown Salon & Spa",
-  "short_name": "Royal Crown",
-  "description": "Premium Salon Booking App",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0F4C5C",
-  "theme_color": "#0F4C5C",
-  "icons": [
-    {
-      "src": "https://picsum.photos/id/64/192/192",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://picsum.photos/id/64/512/512",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+    "name": "Royal Crown Salon & Spa",
+    "short_name": "Royal Crown",
+    "description": "Book salon and spa services with Royal Crown",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#FAF9F6",
+    "theme_color": "#0F4C5C",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/static/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
 }
