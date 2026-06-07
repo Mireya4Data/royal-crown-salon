@@ -4,14 +4,17 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Service, Staff, Booking
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, date
+
 
 def home(request):
     return render(request, 'home.html')
 
+
 def services(request):
     services_list = Service.objects.all()
     return render(request, 'services.html', {'services': services_list})
+
 
 def register(request):
     if request.method == 'POST':
@@ -25,6 +28,7 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'register.html', {'form': form})
 
+
 def user_login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -37,16 +41,35 @@ def user_login(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
+
 def user_logout(request):
     logout(request)
     return redirect('home')
 
 
+def gallery(request):
+    return render(request, 'gallery.html')
+
 
 @login_required(login_url='login')
 def my_bookings(request):
+    today = date.today()
+    Booking.objects.filter(date__lt=today, status='pending').update(status='completed')
     bookings = Booking.objects.filter(customer=request.user).order_by('-date', '-start_time')
     return render(request, 'my_bookings.html', {'bookings': bookings})
+
+
+@login_required(login_url='login')
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, customer=request.user)
+    if booking.status == 'pending':
+        booking.status = 'cancelled'
+        booking.save()
+        messages.success(request, "Booking has been cancelled successfully.")
+    else:
+        messages.error(request, "Only pending bookings can be cancelled.")
+    return redirect('my_bookings')
+
 
 @login_required(login_url='login')
 def book_service(request, service_id):
@@ -57,10 +80,10 @@ def book_service(request, service_id):
         date_str = request.POST.get('date')
         start_time_str = request.POST.get('start_time')
         staff_id = request.POST.get('staff_id')
-        
+
         try:
             staff = Staff.objects.get(id=staff_id) if staff_id else Staff.objects.first()
-            
+
             if not staff:
                 messages.error(request, "No staff available.")
                 return redirect('book_service', service_id=service.id)
@@ -68,7 +91,6 @@ def book_service(request, service_id):
             start_time = datetime.strptime(start_time_str, '%H:%M').time()
             end_time = (datetime.combine(datetime.today(), start_time) + timedelta(minutes=service.duration)).time()
 
-            # === SCHEDULING ALGORITHM ===
             overlapping = Booking.objects.filter(
                 staff=staff,
                 date=date_str,
@@ -91,44 +113,14 @@ def book_service(request, service_id):
                 end_time=end_time,
                 status='pending'
             )
-            
+
             messages.success(request, f"✅ Booking confirmed with {staff} on {date_str}!")
             return redirect('my_bookings')
-            
+
         except Exception as e:
             messages.error(request, f"Error: {str(e)}")
 
-    # Pass data to template
     return render(request, 'book.html', {
         'service': service,
         'staff_list': staff_list
     })
-
-def gallery(request):
-    return render(request, 'gallery.html')
-
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-
-@login_required(login_url='login')
-def cancel_booking(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id, customer=request.user)
-    if booking.status == 'pending':
-        booking.status = 'cancelled'
-        booking.save()
-        messages.success(request, "Booking has been cancelled successfully.")
-    else:
-        messages.error(request, "Only pending bookings can be cancelled.")
-
-@login_required(login_url='login')
-def my_bookings(request):
-    # Auto update past bookings to completed
-    from datetime import date
-    today = date.today()
-    Booking.objects.filter(date__lt=today, status='pending').update(status='completed')
-    
-    bookings = Booking.objects.filter(customer=request.user).order_by('-date', '-start_time')
-    return render(request, 'my_bookings.html', {'bookings': bookings})
-    return redirect('my_bookings')
