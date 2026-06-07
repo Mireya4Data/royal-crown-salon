@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-l+k8j%%2z5s$xen0+5fj($%6w@*h-3!zd-e9^r5h7km(dp_hl@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['royal-crown-salon.onrender.com', '127.0.0.1', 'localhost']
+
+import os
+SECRET_KEY = os.environ.get('SECRET_KEY', 'your-local-fallback-key')
 
 
 # Application definition
