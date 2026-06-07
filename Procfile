@@ -1,0 +1,1 @@
+web: gunicorn salonbooking.wsgi --log-file -

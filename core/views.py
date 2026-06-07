@@ -1,0 +1,134 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Service, Staff, Booking
+from datetime import datetime, timedelta, time
+
+def home(request):
+    return render(request, 'home.html')
+
+def services(request):
+    services_list = Service.objects.all()
+    return render(request, 'services.html', {'services': services_list})
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Account created successfully!")
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'register.html', {'form': form})
+
+def user_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, f"Welcome back, {user.username}!")
+            return redirect('home')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+def user_logout(request):
+    logout(request)
+    return redirect('home')
+
+
+
+@login_required(login_url='login')
+def my_bookings(request):
+    bookings = Booking.objects.filter(customer=request.user).order_by('-date', '-start_time')
+    return render(request, 'my_bookings.html', {'bookings': bookings})
+
+@login_required(login_url='login')
+def book_service(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+    staff_list = Staff.objects.all()
+
+    if request.method == 'POST':
+        date_str = request.POST.get('date')
+        start_time_str = request.POST.get('start_time')
+        staff_id = request.POST.get('staff_id')
+        
+        try:
+            staff = Staff.objects.get(id=staff_id) if staff_id else Staff.objects.first()
+            
+            if not staff:
+                messages.error(request, "No staff available.")
+                return redirect('book_service', service_id=service.id)
+
+            start_time = datetime.strptime(start_time_str, '%H:%M').time()
+            end_time = (datetime.combine(datetime.today(), start_time) + timedelta(minutes=service.duration)).time()
+
+            # === SCHEDULING ALGORITHM ===
+            overlapping = Booking.objects.filter(
+                staff=staff,
+                date=date_str,
+                status__in=['pending', 'confirmed']
+            ).filter(
+                start_time__lt=end_time,
+                end_time__gt=start_time
+            ).exists()
+
+            if overlapping:
+                messages.error(request, "❌ This time slot is already taken.")
+                return redirect('book_service', service_id=service.id)
+
+            booking = Booking.objects.create(
+                customer=request.user,
+                service=service,
+                staff=staff,
+                date=date_str,
+                start_time=start_time,
+                end_time=end_time,
+                status='pending'
+            )
+            
+            messages.success(request, f"✅ Booking confirmed with {staff} on {date_str}!")
+            return redirect('my_bookings')
+            
+        except Exception as e:
+            messages.error(request, f"Error: {str(e)}")
+
+    # Pass data to template
+    return render(request, 'book.html', {
+        'service': service,
+        'staff_list': staff_list
+    })
+
+def gallery(request):
+    return render(request, 'gallery.html')
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+
+@login_required(login_url='login')
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, customer=request.user)
+    if booking.status == 'pending':
+        booking.status = 'cancelled'
+        booking.save()
+        messages.success(request, "Booking has been cancelled successfully.")
+    else:
+        messages.error(request, "Only pending bookings can be cancelled.")
+
+@login_required(login_url='login')
+def my_bookings(request):
+    # Auto update past bookings to completed
+    from datetime import date
+    today = date.today()
+    Booking.objects.filter(date__lt=today, status='pending').update(status='completed')
+    
+    bookings = Booking.objects.filter(customer=request.user).order_by('-date', '-start_time')
+    return render(request, 'my_bookings.html', {'bookings': bookings})
+    return redirect('my_bookings')
