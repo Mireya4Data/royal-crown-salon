@@ -138,6 +138,10 @@ This project demonstrates practical experience in:
 
 
  Screenshots
+
+Home page
+<img width="1296" height="596" alt="Screenshot (664)" src="https://github.com/user-attachments/assets/d57cdd29-61ef-45e3-a80a-3f113ad17f38" />
+
  
  Service Gallery
 <img width="1297" height="596" alt="Screenshot (660)" src="https://github.com/user-attachments/assets/db0db136-3d95-457a-9178-0c5ddb3929d0" />
@@ -149,6 +153,11 @@ This project demonstrates practical experience in:
  Admin Dashboard
 <img width="1298" height="595" alt="Screenshot (661)" src="https://github.com/user-attachments/assets/b4f587fe-58c7-4ec7-8d60-b9954366ef9c" />
 
+Booking Management
+<img width="1288" height="595" alt="Screenshot (665)" src="https://github.com/user-attachments/assets/1888b22d-043d-4fa6-936e-9397564608c5" />
+
+Sign up Page
+<img width="1297" height="588" alt="Screenshot (667)" src="https://github.com/user-attachments/assets/5b64a3e1-8955-4cbd-bcc2-071e6ec1d40f" />
 
 
  Potential Business Applications
