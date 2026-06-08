@@ -17,13 +17,14 @@ def services(request):
 
 
 def register(request):
+    form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "Account created successfully!")
+            messages.success(request, "🎉 Welcome to Royal Crown! Your account has been created.")
             return redirect('home')
+    return render(request, 'register.html', {'form': form})
 
 
 def user_login(request):

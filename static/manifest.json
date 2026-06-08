@@ -4,7 +4,7 @@
     "description": "Book salon and spa services with Royal Crown",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#FAF9F6",
+    "background_color": "#0F4C5C",
     "theme_color": "#0F4C5C",
     "orientation": "portrait",
     "icons": [

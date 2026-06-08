@@ -19,7 +19,7 @@
     <link rel="icon" type="image/png" href="{% static 'icons/icon-192.png' %}">
 
     <style>
-        body { background: #FAF9F6; font-family: 'Playfair Display', serif; }
+        body { background: #FAF9F6; font-family: 'Playfair Display', serif; margin: 0; }
 
         /* ── NAVBAR ── */
         .navbar { background: #0F4C5C !important; }
@@ -30,19 +30,21 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
         }
-        .navbar-brand img {
-            width: 42px;
-            height: 42px;
-            min-width: 42px;
+        .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
             border-radius: 50%;
-            object-fit: cover;
-            object-position: center;
-            border: 2px solid #D4AF37;
-            display: inline-block;
-            vertical-align: middle;
-     }
-        
+            background: #D4AF37;
+            color: #0F4C5C;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
         @media (max-width: 991px) {
             .navbar-collapse {
                 background: #0F4C5C;
@@ -64,6 +66,10 @@
             font-weight: 700;
             text-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .hero { padding: 130px 0 80px; }
+        }
         .btn-luxury {
             background: #D4AF37;
             color: #0F4C5C;
@@ -82,18 +88,19 @@
             transform: scale(1.05);
         }
 
-        /* ── SERVICE CARDS ── */
-        .service-card {
+        /* ── CARDS ── */
+        .feature-card {
             border: none;
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             transition: all 0.4s;
             background: white;
+            height: 100%;
         }
-        .service-card:hover {
+        .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.25);
+            box-shadow: 0 20px 40px rgba(212,175,55,0.25);
         }
         .service-icon {
             width: 70px;
@@ -110,8 +117,33 @@
         .section-title {
             color: #0F4C5C;
             font-weight: 700;
-            border-left: 4px solid #D4AF37;
-            padding-left: 15px;
+        }
+        .gold-divider {
+            width: 60px;
+            height: 4px;
+            background: #D4AF37;
+            margin: 0 auto 30px;
+            border-radius: 2px;
+        }
+
+        /* ── SERVICE PREVIEW ── */
+        .service-preview-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s;
+            background: white;
+            height: 100%;
+        }
+        .service-preview-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(212,175,55,0.25);
+        }
+        .service-preview-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
         }
 
         /* ── FOOTER ── */
@@ -130,9 +162,12 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'icons/icon-192.png' %}" alt="Logo">
+                <span class="brand-icon">
+                    <i class="fas fa-crown"></i>
+                </span>
                 Royal Crown
             </a>
+
             <button class="navbar-toggler" type="button"
                     data-bs-toggle="collapse"
                     data-bs-target="#navbarNav"
@@ -141,6 +176,7 @@
                     aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto align-items-lg-center">
                     <a class="nav-link" href="{% url 'services' %}">Services</a>
@@ -161,38 +197,58 @@
     <!-- HERO -->
     <section class="hero">
         <div class="container">
-            <p class="mb-2" style="color: #D4AF37; font-size: 1.1rem; letter-spacing: 3px;">✦ WELCOME TO ROYAL CROWN ✦</p>
-            <h1 class="display-4 fw-bold mb-3">Transform Your<br>Beauty Experience</h1>
-            <p class="lead mb-5 opacity-75">Premium Hair, Braids, Manicure & Pedicure Services<br>Designed For Your Confidence</p>
-            <a href="{% url 'services' %}" class="btn btn-luxury btn-lg me-3">Book Appointment</a>
-            <a href="{% url 'gallery' %}" class="btn btn-outline-light btn-lg">View Gallery</a>
+            <p style="color:#D4AF37; font-size:1rem; letter-spacing:4px; margin-bottom:15px;">
+                ✦ WELCOME TO ROYAL CROWN ✦
+            </p>
+            <h1 class="display-4 fw-bold mb-3">
+                Transform Your<br>Beauty Experience
+            </h1>
+            <p class="lead mb-5" style="opacity:0.85;">
+                Premium Hair, Braids, Manicure & Pedicure Services<br>
+                Designed For Your Confidence
+            </p>
+            <a href="{% url 'services' %}" class="btn btn-luxury btn-lg me-2 me-md-3 mb-3">
+                <i class="fas fa-calendar-check me-2"></i>Book Appointment
+            </a>
+            <a href="{% url 'gallery' %}" class="btn btn-outline-light btn-lg mb-3">
+                <i class="fas fa-images me-2"></i>View Gallery
+            </a>
         </div>
     </section>
 
     <!-- WHY CHOOSE US -->
     <section class="py-5" style="background: white;">
         <div class="container py-4">
-            <h2 class="section-title mb-5 text-center" style="border-left: none; padding-left: 0;">Why Choose Royal Crown?</h2>
+            <div class="text-center mb-5">
+                <h2 class="section-title">Why Choose Royal Crown?</h2>
+                <div class="gold-divider"></div>
+            </div>
             <div class="row g-4 text-center">
                 <div class="col-md-4">
-                    <div class="service-card p-4 h-100">
-                        <div class="service-icon"><i class="fas fa-crown"></i></div>
-                        <h5 style="color: #0F4C5C;">Premium Quality</h5>
+                    <div class="feature-card p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h5 class="section-title">Premium Quality</h5>
                         <p class="text-muted">We use only the finest products to ensure your hair and skin receive the royal treatment they deserve.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="service-card p-4 h-100">
-                        <div class="service-icon"><i class="fas fa-users"></i></div>
-                        <h5 style="color: #0F4C5C;">Expert Stylists</h5>
-                        <p class="text-muted">Our team of professional stylists are trained in the latest techniques and trends.</p>
+                    <div class="feature-card p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h5 class="section-title">Expert Stylists</h5>
+                        <p class="text-muted">Our team of professional stylists are trained in the latest techniques and trends to give you the best.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="service-card p-4 h-100">
-                        <div class="service-icon"><i class="fas fa-calendar-check"></i></div>
-                        <h5 style="color: #0F4C5C;">Easy Booking</h5>
-                        <p class="text-muted">Book your appointment online in seconds. Choose your service, staff, and preferred time slot.</p>
+                    <div class="feature-card p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h5 class="section-title">Easy Booking</h5>
+                        <p class="text-muted">Book your appointment online in seconds. Choose your service, staff, and preferred time slot easily.</p>
                     </div>
                 </div>
             </div>
@@ -202,41 +258,56 @@
     <!-- OUR SERVICES PREVIEW -->
     <section class="py-5" style="background: #FAF9F6;">
         <div class="container py-4">
-            <h2 class="section-title mb-5">Our Services</h2>
+            <div class="text-center mb-5">
+                <h2 class="section-title">Our Services</h2>
+                <div class="gold-divider"></div>
+                <p class="text-muted">Handcrafted beauty experiences just for you</p>
+            </div>
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="service-card h-100">
+                    <div class="service-preview-card">
                         <img src="https://images.unsplash.com/photo-1594254773847-9fce26e950bc?w=600&h=300&fit=crop&auto=format"
-                             class="img-fluid w-100" style="height:200px; object-fit:cover;" alt="Braids">
+                             alt="Braids">
                         <div class="p-4">
-                            <h5 style="color:#0F4C5C;">Braids</h5>
-                            <p class="text-muted small">Box braids, cornrows, knotless braids and more — expertly crafted.</p>
+                            <h5 class="section-title">
+                                <i class="fas fa-star me-2" style="color:#D4AF37;"></i>Braids
+                            </h5>
+                            <p class="text-muted small">Box braids, cornrows, knotless braids and more — expertly crafted for your style.</p>
                             <a href="{% url 'services' %}" class="btn btn-luxury btn-sm px-4">Book Now</a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="service-card h-100">
+                    <div class="service-preview-card">
                         <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&h=300&fit=crop&auto=format"
-                             class="img-fluid w-100" style="height:200px; object-fit:cover;" alt="Haircut">
+                             alt="Haircut">
                         <div class="p-4">
-                            <h5 style="color:#0F4C5C;">Haircut</h5>
-                            <p class="text-muted small">Precision fades, low cuts, beard grooming and styling for men.</p>
+                            <h5 class="section-title">
+                                <i class="fas fa-star me-2" style="color:#D4AF37;"></i>Haircut
+                            </h5>
+                            <p class="text-muted small">Precision fades, low cuts, beard grooming and expert styling for men.</p>
                             <a href="{% url 'services' %}" class="btn btn-luxury btn-sm px-4">Book Now</a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="service-card h-100">
+                    <div class="service-preview-card">
                         <img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&h=300&fit=crop&auto=format"
-                             class="img-fluid w-100" style="height:200px; object-fit:cover;" alt="Manicure">
+                             alt="Manicure and Pedicure">
                         <div class="p-4">
-                            <h5 style="color:#0F4C5C;">Manicure & Pedicure</h5>
-                            <p class="text-muted small">Luxury nail care, nail art, gel nails and relaxing foot treatments.</p>
+                            <h5 class="section-title">
+                                <i class="fas fa-star me-2" style="color:#D4AF37;"></i>Manicure & Pedicure
+                            </h5>
+                            <p class="text-muted small">Luxury nail care, nail art, gel nails and relaxing spa foot treatments.</p>
                             <a href="{% url 'services' %}" class="btn btn-luxury btn-sm px-4">Book Now</a>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="text-center mt-5">
+                <a href="{% url 'services' %}" class="btn btn-luxury px-5">
+                    View All Services
+                </a>
             </div>
         </div>
     </section>
@@ -244,19 +315,28 @@
     <!-- FOOTER -->
     <footer class="footer">
         <div class="container text-center">
-            <h4 style="color: #D4AF37;" class="mb-3">Royal Crown Salon & Spa</h4>
-            <p class="opacity-75">Premium beauty services tailored for you</p>
             <div class="mb-3">
-                <a href="{% url 'services' %}" class="me-3">Services</a>
-                <a href="{% url 'gallery' %}" class="me-3">Gallery</a>
+                <span class="brand-icon d-inline-flex mx-auto mb-3">
+                    <i class="fas fa-crown"></i>
+                </span>
+            </div>
+            <h4 style="color:#D4AF37;" class="mb-2">Royal Crown Salon & Spa</h4>
+            <p style="opacity:0.7;" class="mb-4">Premium beauty services tailored for you</p>
+            <div class="mb-4">
+                <a href="{% url 'services' %}" class="me-4">Services</a>
+                <a href="{% url 'gallery' %}" class="me-4">Gallery</a>
                 <a href="{% url 'my_bookings' %}">My Bookings</a>
             </div>
-            <hr style="border-color: rgba(255,255,255,0.2);">
-            <p class="small opacity-50 mb-0">&copy; 2026 Royal Crown Salon & Spa. All rights reserved.</p>
+            <hr style="border-color: rgba(255,255,255,0.15);">
+            <p class="small mb-0" style="opacity:0.5;">
+                &copy; 2026 Royal Crown Salon & Spa. All rights reserved.
+            </p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- PWA Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/service_worker.js')
@@ -264,5 +344,6 @@
                 .catch(err => console.log('SW error:', err));
         }
     </script>
+
 </body>
 </html>

@@ -230,4 +230,6 @@
         }
 
         // Auto-show toasts
-        document.querySelectorAll('.toast'
+        document.querySelectorAll('.toast').forEach(el => {
+            new bootstrap.Toast(el).show();
+        })
