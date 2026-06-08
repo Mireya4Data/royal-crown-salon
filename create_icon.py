@@ -2,43 +2,38 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 
 def create_icon(size, filename):
-    # Create image with teal background
-    img = Image.new('RGB', (size, size), color='#0F4C5C')
+    img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
-    # Draw a gold circle
-    margin = size // 8
-    draw.ellipse(
-        [margin, margin, size - margin, size - margin],
-        fill='#D4AF37'
-    )
+    # Teal background circle
+    draw.ellipse([0, 0, size, size], fill='#0F4C5C')
 
-    # Draw "RC" text in teal color centered on the gold circle
-    text = "RC"
-    font_size = size // 3
+    # Gold inner circle
+    margin = int(size * 0.12)
+    draw.ellipse([margin, margin, size - margin, size - margin], fill='#D4AF37')
 
+    # RC text in teal
+    font_size = int(size * 0.32)
     try:
-        font = ImageFont.truetype("arial.ttf", font_size)
+        font = ImageFont.truetype("arialbd.ttf", font_size)
     except:
         try:
             font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size)
         except:
             font = ImageFont.load_default()
 
-    # Get text size and center it
-    bbox = draw.textbbox((0, 0), text, font=font)
-    text_width = bbox[2] - bbox[0]
-    text_height = bbox[3] - bbox[1]
-    x = (size - text_width) // 2
-    y = (size - text_height) // 2 - (size // 20)
+    bbox = draw.textbbox((0, 0), "RC", font=font)
+    text_w = bbox[2] - bbox[0]
+    text_h = bbox[3] - bbox[1]
+    x = (size - text_w) // 2
+    y = (size - text_h) // 2
 
-    draw.text((x, y), text, fill='#0F4C5C', font=font)
+    draw.text((x, y), "RC", fill='#0F4C5C', font=font)
 
-    # Save
     os.makedirs('core/static/icons', exist_ok=True)
-    img.save(filename)
-    print(f"Created {filename}")
+    img.save(filename, 'PNG')
+    print(f"✅ Created {filename}")
 
 create_icon(192, 'core/static/icons/icon-192.png')
 create_icon(512, 'core/static/icons/icon-512.png')
-print("Icons created successfully!")
+print("🎉 Both icons created!")

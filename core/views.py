@@ -122,3 +122,21 @@ def book_service(request, service_id):
         'service': service,
         'staff_list': staff_list
     })
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required(login_url='login')
+def admin_bookings(request):
+    all_bookings = Booking.objects.all().order_by('-date', '-start_time')
+    total = all_bookings.count()
+    pending = all_bookings.filter(status='pending').count()
+    confirmed = all_bookings.filter(status='confirmed').count()
+    completed = all_bookings.filter(status='completed').count()
+    cancelled = all_bookings.filter(status='cancelled').count()
+    return render(request, 'admin_bookings.html', {
+        'all_bookings': all_bookings,
+        'total': total,
+        'pending': pending,
+        'confirmed': confirmed,
+        'completed': completed,
+        'cancelled': cancelled,
+    })
