@@ -43,19 +43,33 @@
         .register-header p { color: rgba(255,255,255,0.8); }
 
         .form-label { color: #0F4C5C; font-weight: 600; font-size: 0.9rem; }
-        .form-control {
+
+        /* Style all inputs including Django-rendered ones */
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            width: 100%;
             padding: 12px 15px;
             border-radius: 12px;
             border: 2px solid #e0e0e0;
             font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box;
         }
-        .form-control:focus {
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="email"]:focus {
             border-color: #D4AF37;
             box-shadow: 0 0 0 0.2rem rgba(212,175,55,0.25);
         }
+
         /* Password toggle wrapper */
         .password-wrapper { position: relative; }
-        .password-wrapper .form-control { padding-right: 45px; }
+        .password-wrapper input[type="password"],
+        .password-wrapper input[type="text"] {
+            padding-right: 45px;
+        }
         .toggle-password {
             position: absolute;
             right: 14px;
@@ -67,6 +81,7 @@
             border: none;
             padding: 0;
             font-size: 1rem;
+            z-index: 10;
         }
         .toggle-password:hover { color: #0F4C5C; }
 
@@ -79,20 +94,27 @@
             font-size: 1rem;
             border: none;
             transition: all 0.3s;
+            width: 100%;
         }
         .btn-register:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(212,175,55,0.4);
             color: #0F4C5C;
         }
-        /* Success toast notification */
-        .toast-container { z-index: 9999; }
 
-        /* Django form help text and errors */
-        .helptext { font-size: 0.78rem; color: #888; display: block; margin-top: 4px; }
+        /* Help text and errors */
+        .helptext {
+            font-size: 0.78rem;
+            color: #888;
+            display: block;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
         .errorlist { list-style: none; padding: 0; margin: 4px 0 0; }
         .errorlist li { color: #dc3545; font-size: 0.82rem; }
-        ul.errorlist { margin-bottom: 0; }
+
+        /* Toast */
+        .toast-container { z-index: 9999; }
     </style>
 </head>
 <body>
@@ -104,18 +126,19 @@
                 <i class="fas fa-crown me-2" style="color:#D4AF37;"></i>Royal Crown
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{% url 'login' %}">Already have an account? Login</a>
+                <a class="nav-link text-white" href="{% url 'login' %}">Already have an account? Login</a>
             </div>
         </div>
     </nav>
 
-    <!-- SUCCESS TOAST -->
+    <!-- SUCCESS / ERROR TOAST -->
     {% if messages %}
     <div class="toast-container position-fixed top-0 end-0 p-3">
         {% for message in messages %}
         <div class="toast align-items-center text-white border-0 show
                     {% if message.tags == 'success' %}bg-success{% else %}bg-danger{% endif %}"
-             role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="4000">
+             role="alert" aria-live="assertive" aria-atomic="true"
+             data-bs-autohide="true" data-bs-delay="4000">
             <div class="d-flex">
                 <div class="toast-body">
                     <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
@@ -131,6 +154,7 @@
     <!-- REGISTER FORM -->
     <div class="register-wrapper">
         <div class="register-card">
+
             <div class="register-header">
                 <div style="font-size:2.5rem; color:#D4AF37; margin-bottom:10px;">
                     <i class="fas fa-crown"></i>
@@ -140,51 +164,70 @@
             </div>
 
             <div class="p-4 p-md-5">
-                <form method="post" id="registerForm">
+                <form method="post">
                     {% csrf_token %}
 
                     {% for field in form %}
                     <div class="mb-3">
-                        <label class="form-label">{{ field.label }}</label>
+                        <label class="form-label" for="{{ field.auto_id }}">{{ field.label }}</label>
 
                         {% if "password" in field.html_name %}
-                        <!-- Password field with toggle -->
-                        <div class="password-wrapper">
-                            <input type="password"
-                                   name="{{ field.html_name }}"
-                                   id="{{ field.auto_id }}"
-                                   class="form-control {% if field.errors %}is-invalid{% endif %}"
-                                   {% if field.field.required %}required{% endif %}>
-                            <button type="button" class="toggle-password" onclick="togglePassword('{{ field.auto_id }}', this)">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
+                            <!-- Password field with show/hide toggle -->
+                            <div class="password-wrapper">
+                                {{ field }}
+                                <button type="button"
+                                        class="toggle-password"
+                                        onclick="togglePassword('{{ field.auto_id }}', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         {% else %}
-                        <!-- Regular field -->
-                        <input type="{{ field.field.widget.input_type }}"
-                               name="{{ field.html_name }}"
-                               id="{{ field.auto_id }}"
-                               class="form-control {% if field.errors %}is-invalid{% endif %}"
-                               value="{{ field.value|default:'' }}"
-                               {% if field.field.required %}required{% endif %}>
+                            <!-- Regular field (username etc) -->
+                            {{ field }}
                         {% endif %}
 
                         {% if field.help_text %}
-                        <span class="helptext">{{ field.help_text }}</span>
+                            <span class="helptext">{{ field.help_text }}</span>
                         {% endif %}
+
                         {% if field.errors %}
-                        <ul class="errorlist">
-                            {% for error in field.errors %}
-                            <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
+                            <ul class="errorlist">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
                         {% endif %}
                     </div>
                     {% endfor %}
 
-                    <button type="submit" class="btn btn-register w-100 mt-3">
+                    <button type="submit" class="btn-register mt-3">
                         <i class="fas fa-user-plus me-2"></i>Create Account
                     </button>
                 </form>
 
                 <p class="text-center mt-4 mb-0">
+                    Already have an account?
+                    <a href="{% url 'login' %}" style="color:#0F4C5C; font-weight:600;">Login here</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Password show/hide toggle
+        function togglePassword(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Auto-show toasts
+        document.querySelectorAll('.toast'
