@@ -22,7 +22,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "🎉 Welcome to Royal Crown! Your account has been created.")
+            messages.success(request, "🎉 Welcome to Royal Crown! Your account has been created successfully.")
             return redirect('home')
     return render(request, 'register.html', {'form': form})
 

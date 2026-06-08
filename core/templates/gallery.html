@@ -47,7 +47,12 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: #0F4C5C;">
     <div class="container">
-        <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">Royal Crown</a>
+        <a class="navbar-brand logo" href="{% url 'home' %}">
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:35px;height:35px;min-width:35px;border-radius:50%;background:#D4AF37;color:#0F4C5C;font-size:1rem;margin-right:8px;">
+        <i class="fas fa-crown"></i>
+    </span>
+    Royal Crown
+      </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -72,7 +77,7 @@
 </nav>
 
     <div class="gallery-header text-center">
-        <h1 class="display-4 fw-bold">Our Work Gallery</h1>
+        <h1 class="display-4 fw-bold" style="color:#D4AF37;">Our Work Gallery</h1>
         <p class="lead">Showcasing Excellence in Every Style</p>
     </div>
 
