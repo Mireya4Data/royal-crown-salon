@@ -39,23 +39,23 @@
             padding: 40px 30px;
             text-align: center;
         }
-        .register-header h2 { font-weight: 700; }
+        .register-header h2 { font-weight: 700; color: #D4AF37; }
         .register-header p { color: rgba(255,255,255,0.8); }
-
         .form-label { color: #0F4C5C; font-weight: 600; font-size: 0.9rem; }
 
-        /* Style all inputs including Django-rendered ones */
+        /* Style ALL inputs including Django-rendered ones */
         input[type="text"],
         input[type="password"],
         input[type="email"] {
             width: 100%;
-            padding: 12px 15px;
+            padding: 12px 45px 12px 15px;
             border-radius: 12px;
             border: 2px solid #e0e0e0;
             font-size: 0.95rem;
             outline: none;
             transition: border-color 0.3s, box-shadow 0.3s;
             box-sizing: border-box;
+            display: block;
         }
         input[type="text"]:focus,
         input[type="password"]:focus,
@@ -64,11 +64,9 @@
             box-shadow: 0 0 0 0.2rem rgba(212,175,55,0.25);
         }
 
-        /* Password toggle wrapper */
-        .password-wrapper { position: relative; }
-        .password-wrapper input[type="password"],
-        .password-wrapper input[type="text"] {
-            padding-right: 45px;
+        .password-wrapper {
+            position: relative;
+            display: block;
         }
         .toggle-password {
             position: absolute;
@@ -82,6 +80,7 @@
             padding: 0;
             font-size: 1rem;
             z-index: 10;
+            line-height: 1;
         }
         .toggle-password:hover { color: #0F4C5C; }
 
@@ -95,14 +94,12 @@
             border: none;
             transition: all 0.3s;
             width: 100%;
+            cursor: pointer;
         }
         .btn-register:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(212,175,55,0.4);
-            color: #0F4C5C;
         }
-
-        /* Help text and errors */
         .helptext {
             font-size: 0.78rem;
             color: #888;
@@ -113,8 +110,46 @@
         .errorlist { list-style: none; padding: 0; margin: 4px 0 0; }
         .errorlist li { color: #dc3545; font-size: 0.82rem; }
 
-        /* Toast */
-        .toast-container { z-index: 9999; }
+        /* Instant toast styles — no Bootstrap dependency */
+        .custom-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            min-width: 300px;
+            max-width: 400px;
+            background: #198754;
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(120%);
+            transition: all 0.4s ease;
+        }
+        .custom-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .custom-toast.error { background: #dc3545; }
+        .custom-toast .toast-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .custom-toast .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0;
+            opacity: 0.8;
+            flex-shrink: 0;
+        }
+        .custom-toast .toast-close:hover { opacity: 1; }
     </style>
 </head>
 <body>
@@ -123,7 +158,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fas fa-crown me-2" style="color:#D4AF37;"></i>Royal Crown
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:35px;height:35px;border-radius:50%;background:#D4AF37;color:#0F4C5C;font-size:1rem;margin-right:8px;">
+                    <i class="fas fa-crown"></i>
+                </span>
+                Royal Crown
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link text-white" href="{% url 'login' %}">Already have an account? Login</a>
@@ -131,30 +169,22 @@
         </div>
     </nav>
 
-    <!-- SUCCESS / ERROR TOAST -->
+    <!-- INSTANT TOAST — shown immediately via JS, no Bootstrap needed -->
     {% if messages %}
-    <div class="toast-container position-fixed top-0 end-0 p-3">
         {% for message in messages %}
-        <div class="toast align-items-center text-white border-0 show
-                    {% if message.tags == 'success' %}bg-success{% else %}bg-danger{% endif %}"
-             role="alert" aria-live="assertive" aria-atomic="true"
-             data-bs-autohide="true" data-bs-delay="4000">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
-                    {{ message }}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
+        <div class="custom-toast {% if message.tags != 'success' %}error{% endif %}" id="mainToast">
+            <span class="toast-icon">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+            </span>
+            <span>{{ message }}</span>
+            <button class="toast-close" onclick="closeToast()">&times;</button>
         </div>
         {% endfor %}
-    </div>
     {% endif %}
 
     <!-- REGISTER FORM -->
     <div class="register-wrapper">
         <div class="register-card">
-
             <div class="register-header">
                 <div style="font-size:2.5rem; color:#D4AF37; margin-bottom:10px;">
                     <i class="fas fa-crown"></i>
@@ -164,7 +194,7 @@
             </div>
 
             <div class="p-4 p-md-5">
-                <form method="post">
+                <form method="post" id="registerForm">
                     {% csrf_token %}
 
                     {% for field in form %}
@@ -172,24 +202,20 @@
                         <label class="form-label" for="{{ field.auto_id }}">{{ field.label }}</label>
 
                         {% if "password" in field.html_name %}
-                            <!-- Password field with show/hide toggle -->
                             <div class="password-wrapper">
                                 {{ field }}
-                                <button type="button"
-                                        class="toggle-password"
-                                        onclick="togglePassword('{{ field.auto_id }}', this)">
+                                <button type="button" class="toggle-password"
+                                        data-target="{{ field.auto_id }}">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         {% else %}
-                            <!-- Regular field (username etc) -->
                             {{ field }}
                         {% endif %}
 
                         {% if field.help_text %}
                             <span class="helptext">{{ field.help_text }}</span>
                         {% endif %}
-
                         {% if field.errors %}
                             <ul class="errorlist">
                                 {% for error in field.errors %}
@@ -210,16 +236,23 @@
                     <a href="{% url 'login' %}" style="color:#0F4C5C; font-weight:600;">Login here</a>
                 </p>
             </div>
-
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Password show/hide toggle
-        function togglePassword(fieldId, btn) {
-            const input = document.getElementById(fieldId);
+        // ── PASSWORD TOGGLE ──
+        // Uses event delegation so it works regardless of when Django renders the input
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.toggle-password');
+            if (!btn) return;
+
+            const targetId = btn.getAttribute('data-target');
+            const input = document.getElementById(targetId);
             const icon = btn.querySelector('i');
+
+            if (!input) return;
+
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.classList.replace('fa-eye', 'fa-eye-slash');
@@ -227,9 +260,28 @@
                 input.type = 'password';
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
+        });
+
+        // ── INSTANT TOAST ──
+        // Shows immediately when page loads — no waiting for Bootstrap
+        function showToast() {
+            const toast = document.getElementById('mainToast');
+            if (!toast) return;
+            // Show immediately
+            setTimeout(() => toast.classList.add('show'), 50);
+            // Auto hide after 5 seconds
+            setTimeout(() => closeToast(), 5000);
         }
 
-        // Auto-show toasts
-        document.querySelectorAll('.toast').forEach(el => {
-            new bootstrap.Toast(el).show();
-        })
+        function closeToast() {
+            const toast = document.getElementById('mainToast');
+            if (!toast) return;
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }
+
+        // Run as soon as page loads
+        showToast();
+    </script>
+</body>
+</html>

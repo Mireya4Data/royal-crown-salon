@@ -295,17 +295,61 @@
         </div>
     </footer>
 
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Show toasts
-        document.querySelectorAll('.toast').forEach(el => new bootstrap.Toast(el).show());
+  <script>
+    // Show toasts
+    document.querySelectorAll('.toast').forEach(el => new bootstrap.Toast(el).show());
 
-        // PWA Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/static/service_worker.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(err => console.log('SW error:', err));
-        }
-    </script>
+    // ── GENERATE CROWN ICON AND SET AS APP ICON ──
+    function generateCrownIcon(size) {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+
+        // Background circle — teal
+        ctx.fillStyle = '#0F4C5C';
+        ctx.beginPath();
+        ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Gold inner circle
+        ctx.fillStyle = '#D4AF37';
+        ctx.beginPath();
+        ctx.arc(size/2, size/2, size * 0.38, 0, Math.PI * 2);
+        ctx.fill();
+
+        // RC text in teal
+        ctx.fillStyle = '#0F4C5C';
+        ctx.font = `bold ${size * 0.28}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('RC', size/2, size/2);
+
+        return canvas.toDataURL('image/png');
+    }
+
+    // Set favicon
+    const icon32 = generateCrownIcon(32);
+    const favicon = document.querySelector("link[rel='icon']") || document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.href = icon32;
+    document.head.appendChild(favicon);
+
+    // Set apple touch icon
+    const icon192 = generateCrownIcon(192);
+    const appleIcon = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
+    appleIcon.rel = 'apple-touch-icon';
+    appleIcon.href = icon192;
+    document.head.appendChild(appleIcon);
+
+    // PWA Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/service_worker.js')
+            .then(() => console.log('Service Worker registered'))
+            .catch(err => console.log('SW error:', err));
+    }
+</script>
 </body>
 </html>
