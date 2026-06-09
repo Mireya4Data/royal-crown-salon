@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from .models import Service, Staff, Booking
 from datetime import datetime, timedelta, date
 
@@ -14,6 +15,10 @@ def home(request):
 def services(request):
     services_list = Service.objects.all()
     return render(request, 'services.html', {'services': services_list})
+
+
+def gallery(request):
+    return render(request, 'gallery.html')
 
 
 def register(request):
@@ -36,8 +41,7 @@ def user_login(request):
             messages.success(request, f"Welcome back, {user.username}!")
             return redirect('home')
         else:
-            # Form will contain errors — template shows error alert
-            return render(request, 'login.html', {'form': form})
+            return render(request, 'login.html', {'form': form, 'login_error': True})
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
@@ -45,12 +49,7 @@ def user_login(request):
 
 def user_logout(request):
     logout(request)
-    messages.success(request, "You have been logged out successfully.")
     return redirect('login')
-
-
-def gallery(request):
-    return render(request, 'gallery.html')
 
 
 @login_required(login_url='login')
@@ -103,10 +102,10 @@ def book_service(request, service_id):
             ).exists()
 
             if overlapping:
-                messages.error(request, "❌ This time slot is already taken.")
+                messages.error(request, "❌ This time slot is already taken. Please choose another time.")
                 return redirect('book_service', service_id=service.id)
 
-            booking = Booking.objects.create(
+            Booking.objects.create(
                 customer=request.user,
                 service=service,
                 staff=staff,
@@ -124,9 +123,9 @@ def book_service(request, service_id):
 
     return render(request, 'book.html', {
         'service': service,
-        'staff_list': staff_list
+        'staff_list': staff_list,
     })
-from django.contrib.admin.views.decorators import staff_member_required
+
 
 @staff_member_required(login_url='login')
 def admin_bookings(request):
