@@ -35,6 +35,9 @@ def user_login(request):
             login(request, user)
             messages.success(request, f"Welcome back, {user.username}!")
             return redirect('home')
+        else:
+            # Form will contain errors — template shows error alert
+            return render(request, 'login.html', {'form': form})
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
@@ -42,7 +45,8 @@ def user_login(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('home')
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('login')
 
 
 def gallery(request):
