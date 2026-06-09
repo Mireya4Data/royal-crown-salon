@@ -8,9 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-l+k8j%%2z5s$xen0+5fj($%6w@*h-3!zd-e9^r5h7km(dp_hl@')
 
 # Set to True temporarily to see errors, then change back to False
-DEBUG = True
-
-ALLOWED_HOSTS = ['royal-crown-salon.onrender.com', '127.0.0.1', 'localhost', '*']
+DEBUG = False
+ALLOWED_HOSTS = ['royal-crown-salon.onrender.com', '127.0.0.1', 'localhost']
 
 # Application definition
 INSTALLED_APPS = [
