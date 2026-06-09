@@ -10,85 +10,357 @@
     <style>
         body { background: #FAF9F6; font-family: 'Playfair Display', serif; }
         .navbar { background: #0F4C5C !important; }
-        .logo { color: #D4AF37; font-weight: 700; font-size: 1.8rem; }
+        .navbar-brand {
+            color: #D4AF37 !important;
+            font-weight: 700;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 50%;
+            background: #D4AF37;
+            color: #0F4C5C;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background: #0F4C5C;
+                padding: 15px;
+                border-radius: 10px;
+                margin-top: 10px;
+            }
+        }
+        .page-header {
+            background: linear-gradient(135deg, #0F4C5C, #1a6b7f);
+            color: white;
+            padding: 80px 0 40px;
+            margin-top: 56px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
         .booking-card {
             border: none;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             transition: all 0.3s;
+            background: white;
+            overflow: hidden;
+        }
+        .booking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(212,175,55,0.2);
+        }
+        .booking-card .card-header-bar {
+            background: linear-gradient(135deg, #0F4C5C, #1a6b7f);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .booking-card .card-header-bar h5 {
+            color: #D4AF37;
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-confirmed { background: #d1fae5; color: #065f46; }
+        .badge-completed { background: #dbeafe; color: #1e40af; }
+        .badge-cancelled { background: #fee2e2; color: #991b1b; }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 0.92rem;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(212,175,55,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #D4AF37;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .detail-label { color: #888; font-size: 0.8rem; display: block; }
+        .detail-value { color: #0F4C5C; font-weight: 600; }
+
+        .btn-cancel {
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .btn-cancel:hover {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-luxury {
+            background: #D4AF37;
+            color: #0F4C5C;
+            font-weight: 700;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 1rem;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .btn-luxury:hover { background: #0F4C5C; color: #D4AF37; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0F4C5C, #1a6b7f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2.5rem;
+            color: #D4AF37;
+        }
+
+        /* Footer */
+        .footer { background: #0F4C5C; color: white; padding: 40px 0 20px; }
+        .footer a { color: #D4AF37; text-decoration: none; }
+        .footer a:hover { color: white; }
+
+        /* Messages toast */
+        .custom-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            min-width: 300px;
+            max-width: 400px;
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(120%);
+            transition: all 0.4s ease;
+        }
+        .custom-toast.show { opacity: 1; transform: translateX(0); }
+        .custom-toast.success { background: #059669; }
+        .custom-toast.error { background: #dc2626; }
+        .custom-toast .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0;
+            opacity: 0.8;
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: #0F4C5C;">
-    <div class="container">
-        <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">Royal Crown</a>
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{% url 'services' %}">Services</a>
-                <a class="nav-link" href="{% url 'gallery' %}">Gallery</a>
-                <a class="nav-link" href="{% url 'my_bookings' %}">My Bookings</a>
-                
-                {% if user.is_authenticated %}
-                    <span class="nav-link">Hi, {{ user.username }}</span>
-                    <a class="btn btn-outline-light ms-3" href="{% url 'logout' %}">Logout</a>
-                {% else %}
-                    <a class="btn btn-outline-light ms-3" href="{% url 'login' %}">Login</a>
-                    <a class="btn btn-light ms-2" href="{% url 'register' %}">Register</a>
-                {% endif %}
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <span class="brand-icon"><i class="fas fa-crown"></i></span>
+                Royal Crown
+            </a>
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto align-items-lg-center">
+                    <a class="nav-link" href="{% url 'services' %}">Services</a>
+                    <a class="nav-link" href="{% url 'gallery' %}">Gallery</a>
+                    <a class="nav-link active" href="{% url 'my_bookings' %}">My Bookings</a>
+                    {% if user.is_staff %}
+                    <a class="nav-link fw-bold" style="color:#D4AF37;" href="{% url 'admin_bookings' %}">
+                        <i class="fas fa-shield-alt me-1"></i>Admin
+                    </a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <span class="nav-link">Hi, {{ user.username }}</span>
+                        <a class="btn btn-outline-light ms-lg-3 mt-2 mt-lg-0" href="{% url 'logout' %}">Logout</a>
+                    {% else %}
+                        <a class="btn btn-outline-light ms-lg-3 mt-2 mt-lg-0" href="{% url 'login' %}">Login</a>
+                        <a class="btn btn-light ms-lg-2 mt-2 mt-lg-0" href="{% url 'register' %}">Register</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
+    </nav>
+
+    <!-- TOAST MESSAGES -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="custom-toast {% if message.tags == 'success' %}success{% else %}error{% endif %}"
+             id="pageToast">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+            <span>{{ message }}</span>
+            <button class="toast-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1 class="display-5 fw-bold" style="color: #D4AF37;">
+            <i class="fas fa-calendar-check me-3"></i>My Appointments
+        </h1>
+        <p class="lead opacity-75">Manage your Royal Crown bookings</p>
     </div>
-</nav>
 
-    <div class="container mt-5 pt-5">
-        <h1 class="display-5 fw-bold text-center mb-5" style="color: #0F4C5C;">My Appointments</h1>
-
+    <div class="container pb-5">
         {% if bookings %}
-            <div class="row">
+            <!-- BOOKING COUNT -->
+            <p class="text-muted mb-4 text-center">
+                You have <strong style="color:#0F4C5C;">{{ bookings|length }}</strong>
+                appointment{{ bookings|length|pluralize }}
+            </p>
+
+            <div class="row g-4">
                 {% for booking in bookings %}
-                <div class="col-lg-8 mx-auto mb-4">
-                    <div class="card booking-card">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start">
+                <div class="col-lg-6 col-md-8 mx-auto col-lg-6">
+                    <div class="booking-card">
+
+                        <!-- Card Header -->
+                        <div class="card-header-bar">
+                            <h5><i class="fas fa-scissors me-2"></i>{{ booking.service.name }}</h5>
+                            <span class="status-badge
+                                {% if booking.status == 'pending' %}badge-pending
+                                {% elif booking.status == 'confirmed' %}badge-confirmed
+                                {% elif booking.status == 'completed' %}badge-completed
+                                {% elif booking.status == 'cancelled' %}badge-cancelled
+                                {% endif %}">
+                                {{ booking.status|title }}
+                            </span>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-4">
+                            <div class="detail-row">
+                                <div class="detail-icon"><i class="fas fa-calendar"></i></div>
                                 <div>
-                                    <h4>{{ booking.service.name }}</h4>
-                                    <p><strong>Date:</strong> {{ booking.date }}</p>
-                                    <p><strong>Time:</strong> {{ booking.start_time }} - {{ booking.end_time }}</p>
-                                    <p><strong>Stylist:</strong> {{ booking.staff }}</p>
-                                </div>
-                                
-                                <div class="text-end">
-                                    <span class="badge bg-success px-4 py-2">
-                                        {{ booking.status|title }}
-                                    </span>
-                                    
-                                    {% if booking.status == 'pending' %}
-                                        <a href="{% url 'cancel_booking' booking.id %}" 
-                                           class="btn btn-danger btn-sm mt-2"
-                                           onclick="return confirm('Are you sure you want to cancel this booking?')">
-                                            Cancel Booking
-                                        </a>
-                                    {% endif %}
+                                    <span class="detail-label">Date</span>
+                                    <span class="detail-value">{{ booking.date }}</span>
                                 </div>
                             </div>
+                            <div class="detail-row">
+                                <div class="detail-icon"><i class="fas fa-clock"></i></div>
+                                <div>
+                                    <span class="detail-label">Time</span>
+                                    <span class="detail-value">{{ booking.start_time|time:"H:i" }} – {{ booking.end_time|time:"H:i" }}</span>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-icon"><i class="fas fa-user-tie"></i></div>
+                                <div>
+                                    <span class="detail-label">Stylist</span>
+                                    <span class="detail-value">{{ booking.staff }}</span>
+                                </div>
+                            </div>
+
+                            {% if booking.status == 'pending' %}
+                            <div class="mt-3 text-end">
+                                <a href="{% url 'cancel_booking' booking.id %}"
+                                   class="btn-cancel"
+                                   onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                    <i class="fas fa-times me-1"></i>Cancel Booking
+                                </a>
+                            </div>
+                            {% endif %}
                         </div>
+
                     </div>
                 </div>
                 {% endfor %}
             </div>
+
         {% else %}
-            <div class="text-center py-5">
-                <h3>You have no appointments yet</h3>
-                <p class="lead">Book your first premium experience with us</p>
-                <a href="{% url 'services' %}" class="btn btn-dark btn-lg px-5">Browse Services</a>
+            <!-- EMPTY STATE -->
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-calendar-plus"></i></div>
+                <h3 style="color:#0F4C5C;" class="fw-bold mb-3">No Appointments Yet</h3>
+                <p class="text-muted lead mb-4">Book your first premium experience with Royal Crown</p>
+                <a href="{% url 'services' %}" class="btn-luxury">
+                    <i class="fas fa-spa me-2"></i>Browse Services
+                </a>
             </div>
         {% endif %}
     </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container text-center">
+            <span class="brand-icon d-inline-flex mx-auto mb-3">
+                <i class="fas fa-crown"></i>
+            </span>
+            <h4 style="color:#D4AF37;" class="mb-2">Royal Crown Salon & Spa</h4>
+            <p style="opacity:0.7;" class="mb-4">Premium beauty services tailored for you</p>
+            <div class="mb-4">
+                <a href="{% url 'services' %}" class="me-4">Services</a>
+                <a href="{% url 'gallery' %}" class="me-4">Gallery</a>
+                <a href="{% url 'my_bookings' %}">My Bookings</a>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.15);">
+            <p class="small mb-0" style="opacity:0.5;">&copy; 2026 Royal Crown Salon & Spa. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Show toast instantly
+        const toast = document.getElementById('pageToast');
+        if (toast) {
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => toast.classList.remove('show'), 5000);
+        }
+    </script>
 </body>
 </html>
